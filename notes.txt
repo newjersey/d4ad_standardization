@@ -1,0 +1,12 @@
+----
+For description standardization I want to identify all acronymns and "unstandardized" language
+
+see: https://github.com/doccano/doccano
+
+trying to find other interactive NLP engines, though
+see: https://github.com/NIHOPA/NLPre
+a specific proprocessing library, w00t!
+
+? https://github.com/philgooch/abbreviation-extraction
+
+also, I should lead with the most accurate standardization, which is probably Google places addresses normalization
