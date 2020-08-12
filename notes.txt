@@ -1,3 +1,9 @@
+okay, got a sketch of the google API
+    it might be enought o just fill in at a later time?
+    move on to semantic?
+
+
+---
 Okay, trying to determine which processes to start with first, doing a tally
 
 Semantic/Keyword match      5
