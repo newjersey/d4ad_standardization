@@ -1,3 +1,27 @@
+Okay, trying to determine which processes to start with first, doing a tally
+
+Semantic/Keyword match      5
+External API                4
+Ask Submitter/Google Form   8 (wow)
+Shorten                     1
+--
+
+So techically I should start w an intelligent google form but ...
+for some reason I thought Google forms weren't going to be relied upon as much.
+3 fields that Google Forms also cite 3 Semantic match
+
+So it look like, actualy, a good semantic matcher is needed? I should probably 
+catpure the Google Places API call function to date and switch here. 
+--
+okay so thinking this through, I should probably have utils folder that includes
+methods. The init can also import already created methods if they're duplicated or 
+parameterized. 
+
+Following my assessment, those methods are then used in processes, which can be done depending
+on the need, so like, finte state machine (https://github.com/pytransitions/transitions#quickstart),
+py rq
+
+
 ----
 For description standardization I want to identify all acronymns and "unstandardized" language
 
