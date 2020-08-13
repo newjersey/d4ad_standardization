@@ -11,6 +11,8 @@ cookiecutter = "*"
 googlemaps = "*"
 ipython = "*"
 python-dotenv = "*"
+pandas = "*"
+xlrd = "*"
 
 [requires]
 python_version = "3.7"
