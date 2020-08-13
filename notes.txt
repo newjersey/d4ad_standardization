@@ -1,3 +1,52 @@
+have a moment here, going to focus on the Semantic/Keyword match
+
+for some reason I was aware of auto-ml but not auto-ml, wow
+see: auto nlp github
+
+okay
+so the first kind of matching is cross-level semantic matching, although that term has fallen
+actually, no, 
+
+CIPCODE - dataset has this filled in, one spot check looks correct. Ignore for now, somehow not needed.
+
+NAME_1 - Program name
+    Certification (A+, etc.)
+    Specific Program (Microsoft Excel)
+    Program Description (as opposed to its name)
+    Program Name with various abbreviations present
+
+I notice that anything that's not a word (e.g. look up in word2vec dictionary) is basically an abbreviation
+Hints at a multi step filtering process with 
+    So this reduces to, basically, take out anything that's not a word, figure out how to do iterative labeling on 
+    that dataset, like active learning. Problem is, number of classes is either unknown or enormous.
+
+    I also assume we'll have a lot of unique values. Perahps a better way is to extract them, sort by similarity
+    and then ... learn to maybe group them?
+
+    Also, does the description mentioning the same content indicate it's a description?
+
+see: https://datascience.stackexchange.com/questions/28594/what-are-helpful-annotation-tools-if-any
+
+Instruction Modality
+    This is actually a more normal/true nlp problem since there are only 4 classes I think. This would
+    be ammenable to the nlp annoators above
+
+NONGOV
+    So this is unique tokens, similarity grouping
+    Then google them out
+    I think Leslie said there were only 27 or so
+
+Preresquite
+    This is matching FeatureDescription, Description to something like Credential engine competency, presquites
+
+--
+So, overall have;
+    * Identify when a token is not a word
+    * Identify what tokens are the same, what tokens are the same as a word
+        This might be done by permuting the word (?)
+        Reminds me of tSNE
+
+---
 okay, got a sketch of the google API
     it might be enought o just fill in at a later time?
     move on to semantic?
