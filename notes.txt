@@ -1,3 +1,12 @@
+Note: can see acronymn expansion problem as a character level
+translation problem (which does make sense)
+
+---
+Okay,
+    this appears to give active learning labeling
+https://inception-project.github.io/example-projects/recommender/
+
+----
 have a moment here, going to focus on the Semantic/Keyword match
 
 for some reason I was aware of auto-ml but not auto-ml, wow
