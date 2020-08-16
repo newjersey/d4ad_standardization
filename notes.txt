@@ -13,16 +13,64 @@ okay, sO I think I have a visually actionabel way forward
         Look at https://    then skip this or flag for manual inspection, then
         it should work reliably for the entire document (or at least as a start)
 
-key theoretical approaches here
+key theoretical assumptions/approaches here
     * sampling can suggest suitablity for the entire thing w/o having to search more
     * that non standardized content can be identified independently, brackets standardized content
-    * a set of rules can reliably be used together to span a string, that is, are consistent <-- ?
+    * (C) a set of rules can reliably be used together to span a string, that is, are consistent <-- ?
     *  
+----
+List of lemmas: https://raw.githubusercontent.com/explosion/spacy-lookups-data/master/spacy_lookups_data/data/en_lemma_lookup.json
+note the lemma "be" which is important for some reason I can't remember righ tnow
+-
+POS tags, note the morphology which might be important
+https://spacy.io/api/annotation#pos-tagging
+--
+Summary of random 100
+* There are several non-standardization references go across the match
+    * Each seem somewhat unique
+
+Had 6 failures out of 100, per https://epitools.ausvet.com.au/ciproportion, this suggests
+a 95% CI of [0.88, 0.97] around 0.96 mean
+So, then, the set of these rules should be Good-Enough
 
 ---
 Work on top 100
 df.sample(n=100, random_state=42)
+-
+X index 1 and 1 conflict, need to basically get non
+conjuncting punct
+        This isn't showing up in the console, it's a punct all the way around
+        this means we need to specially index 1 (note this only happened once so far)
 
+So the best soln so far is 
+    {'ORTH': ','}
+--
+Index 30 has a prior reference across non-standardization 
+"Basic Knowledge of Computers, Windows NT or 98 and database"
+    Windows NT
+    Windows 98 <-- could take 98 to mean [Windows 98] in the CIP context
+similarly 
+*? Index 38 has pior reference 
+"High School Diploma [or] GED [and] Official College Transcript"
+<-- HS or [GED and Transcript]
+?
+-
+*? Note index 50
+"High School Diploma/ GED, and Network+ or equivalent level of knowledge"
+ where 'equivalent level of knowledge' is a big or, references prior
+
+X index 60
+ 'There are no specific prerequisites for this program, but before'
+? weird reference
+--
+* index 65
+'High School Diploma or Equivalent; Reliable PC and Internet Acces'
+has "Equivalent; Reliable PC" as unstandardized token
+--
+* See www.rate.rutgers.edu for details
+    need stop case if it say www.rate.
+
+-
 goal is to figure out a rule that for all samples (100 of them) it
 accurately breaks up the Prerequisites into token statements that
 are or are not abbreviated. The idea is, if i canmake this work on
