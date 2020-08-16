@@ -13,6 +13,7 @@ ipython = "*"
 python-dotenv = "*"
 pandas = "*"
 xlrd = "*"
+spacy = {extras = ["cuda92"],version = "*"}
 
 [requires]
 python_version = "3.7"

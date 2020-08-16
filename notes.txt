@@ -1,4 +1,88 @@
 
+okay, sO I think I have a visually actionabel way forward
+
+* using the matcher gui, here: https://explosion.ai/demos/matcher
+* using the dep parsing graphic, with spacy.displacy.serve(nlp(conj_test), style='dep')
+    * take the sample with df.sample(n=100, random_state=42)
+    * on the sample, using the matcher gui, we want to write a rule, set of rules
+        that tokenizes non prequites or things that don't need to be standardized
+    * by doing this the left, right of tokens include content that needs to be standardized
+        and may already be unabbreviated or may be abbreviated. Either case, it may be need 
+        to be mapped to a canonical name
+    * If I can reliably do this for this sample of 100, including custom rules like if 
+        Look at https://    then skip this or flag for manual inspection, then
+        it should work reliably for the entire document (or at least as a start)
+
+key theoretical approaches here
+    * sampling can suggest suitablity for the entire thing w/o having to search more
+    * that non standardized content can be identified independently, brackets standardized content
+    * a set of rules can reliably be used together to span a string, that is, are consistent <-- ?
+    *  
+
+---
+Work on top 100
+df.sample(n=100, random_state=42)
+
+goal is to figure out a rule that for all samples (100 of them) it
+accurately breaks up the Prerequisites into token statements that
+are or are not abbreviated. The idea is, if i canmake this work on
+a sample of 100 then, per binomial proportion, it should represent
+narly 100% work on the remaining data.
+
+And, with that, I can iteratively translate the abbreviations 
+from english to expanded english into their full ntotation
+---
+
+Okay, uh, this is what I want: https://explosion.ai/demos/matcher
+pretty crazy they're so full featured 
+see: https://spacy.io/usage/rule-based-matching
+
+---
+Okay, so last night during TV watching I stumbled upon the
+EntityMatcher, see: https://spacy.io/api/entityruler
+
+There is also the EntityRecognizer, which is a statistical approach
+
+(and can be combined with)
+see examples here: https://spacy.io/usage/rule-based-matching#entityruler
+
+
+---
+Here's where/how to create your own tokenizer
+
+https://spacy.io/usage/linguistic-features#tokenization
+Here's a nice explanation of the tokenization pipeline: https://spacy.io/usage/linguistic-features#101-data
+
+
+I suspect I want to do mine on:
+    * Symbols (&, comma, etc)
+    * stopwords
+-----
+goal for today:
+* install spacy, language model
+* see if tokenization let's me split up description/target field into tokens (single, multiple words)
+that need to be abbreviated and into tokens that do not need to be abbreviated.
+
+Now, at this point, we need to include context to better learn how to unabbreviate a word (e.g. the CIP code). So this means that the abbreviation needs to be presented alogn with the CIP it came from.
+
+The problem is that i can't read or know CIPs off the top of my head; i need the rest of the context. This suggests a kind of attention model, something. However, this process allows me to, hopefully, rapidly create abbreviation mappings that I can literally just map through.
+--
+ spacy.require_gpu()
+ to enable gpu niceness
+
+-
+python -m spacy download en_core_web_lg
+# see: https://spacy.io/models/en#en_core_web_lg
+
+import spacy
+nlp = spacy.load("en_core_web_lg")
+---
+Idea
+With dictionary of non abbreviations can Id non abbreviations in tokenized string and then identify tokens left in a iteratively as abbreviated tokens
+
+With tokens that need to be abbreviated identified then we can apply a method depending on the field
+
+Active learning should accelerate abbreviation labels with actual full tokens, maybe as translation prob , then we have a giant NER mapping that we can feed back into spaCy for tagging at scale
 
 ---
 Note: can see acronymn expansion problem as a character level
@@ -101,3 +185,4 @@ a specific proprocessing library, w00t!
 ? https://github.com/philgooch/abbreviation-extraction
 
 also, I should lead with the most accurate standardization, which is probably Google places addresses normalization
+
