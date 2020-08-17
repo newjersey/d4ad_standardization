@@ -1,4 +1,73 @@
+k, so next step is to stream out all the presquites as tokens
+and figure out what prodigy task would allow me to efficiently assign classes to them
 
+---
+confirmed that rule set is good, I do think the double space
+---
+Okay, doing this again yeiled
+
+After that examination we found 13  cases out of 83
+0.8433734939759037
+
+but we skip NaN, small_df2.PREREQUISITES.value_counts() is 73 elements
+so we have 27 elements that are NaN
+
+(110-13)/110 <-- 88
+
+so we have average of 0.91
+--
+okay, so we're still above 0.90, so the evaluationis likely correct
+    Also added {'IS_SPACE': True} to capture some spaces
+---
+what does 'later' meanl;it's a presquite but refers to prior token
+'equivalent' is the same thing, remove and reach back
+
+What does 'and' mean inthis context
+'higher' is a backward reference
+
+or (more/older/trained/etc) is defintely a backwards reference that's breaking
+
+Asscoiates or undergraduate degree, etc
+
+Valid NJ or PA License
+    or when use as a CCONJ with a Noun following seems to describe two different things
+
+'.  ' is defintely a token to match for/makes me almost want to do a statistical learner
+---
+K is on a call so I can't buy Prodigy at the moment but i can buyt it after,
+but I should look into making a sampling loops to evaluate another 100
+
+also, as a note, I happeend upon an issue where I was aware of the multiple components to the ansewr, which is good
+
+---
+Ooooookkkkay,
+so one of the founders posted this flowchart for NER, https://prodi.gy/prodigy_flowchart_ner-36f76cffd9cb4ef653a21ee78659d366.pdf
+
+that they recommend for NET bootstrapping, following that path
+I end up at the node that says (after you're sure of your evaluation), Stick with rules, probably not worth training a model.
+---
+Following: https://www.youtube.com/watch?v=l4scwf8KeIA
+
+starts up with seed names, then goes over a list of tokens
+    starts with a match.something  prodigy method
+At 10:25 starts on NER, which requires more context (much like this task)
+    starts, starts with terms-to pattern file (which we may already have)
+    note this is a really simpel format and I can probably export this myself
+
+    does ner.teach <name> en_core_web_lg train --loader <corpus?> --label NER_LABEL --patterns <pattern file>.jsonl
+
+    basic idea is to apply a small series of recipes
+        terms --> bootstrap other terms
+        train in context (NET) --> bootstrap model
+        batch train --> train against labeled data for higher accuracy
+
+prodigy appears to basically be a experiment label and evaluation system
+---
+a more modern tutorial might be here:
+    * https://www.youtube.com/watch?v=59BKHO_xBPA
+
+
+----
 okay, sO I think I have a visually actionabel way forward
 
 * using the matcher gui, here: https://explosion.ai/demos/matcher

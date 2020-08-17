@@ -34,11 +34,54 @@ patterns =\
         # modifiction that combines small_df.iloc[15], [1]
         [{'ORTH': ','}],
         # modifiction seen generally past 50 or os
-        [{'ORTH': ';'}]
+        [{'ORTH': ';'}],
+        # TODO: fix this to work, i could be special casing too early/improperly
+        # modifiction seen random_state*2
+        [{'IS_SPACE': True], # captures present spaces after tokenizations
+
     ]
 
 matcher = Matcher(nlp.vocab)
 matcher.add("DoNotStandardize", patterns)
+
+small_df2 = df.sample(n=N, random_state=random_state*2)
+
+# quick and dirty eval loop; random_seed = 42 for 100 samples had
+# 6 wrong, prodigy NER sheet recommends you use rule matchers if
+# you're sure they evalute better than 90%
+case_rows = []
+
+number_incorrect = 0
+total_cases = 0
+for row in small_df2.iterrows():
+    if isinstance(row[1].PREREQUISITES, str):
+        doc = \
+            nlp(row[1].PREREQUISITES)
+        matches = matcher(doc)
+        # pipe might be faster but we're only examining 100 cases
+        print("\t {} Prerequistites:\t".format(row[0]), doc)
+        match_start = 0
+        for match in matches:
+            total_cases += 1
+            match_end = match[2]
+            print(doc[match_start:match_end])
+            answer = input("correct?")
+            if answer == 'n':
+                number_incorrect += 1
+                case_rows.append(row[0])
+            match_start = match[2]
+            #match_end = match[2]
+        # print last match
+        print(doc[match_start:])
+        answer = input("correct?")
+        if answer == 'n':
+            number_incorrect += 1
+    else:
+        total_cases += 1
+
+print("After that examination we found " + str(number_incorrect) + "  cases out of {}".format(total_cases))
+print("{}".format((total_cases-number_incorrect)/total_cases))
+
 
 doc = nlp(small_df.iloc[0].PREREQUISITES)
 matches = matcher(doc) #  [(14862748245026736845, 2, 3)] --> [or]
