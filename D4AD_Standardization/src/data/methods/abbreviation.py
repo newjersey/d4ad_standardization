@@ -37,14 +37,33 @@ patterns =\
         [{'ORTH': ';'}],
         # TODO: fix this to work, i could be special casing too early/improperly
         # modifiction seen random_state*2
-        [{'IS_SPACE': True], # captures present spaces after tokenizations
-
+        [{'IS_SPACE': True}], # captures present spaces after tokenizations
     ]
 
 matcher = Matcher(nlp.vocab)
 matcher.add("DoNotStandardize", patterns)
 
-small_df2 = df.sample(n=N, random_state=random_state*2)
+total_cases = 0
+for row in small_df2.iterrows():
+    prerequisites = row[1].PREREQUISITES
+    if isinstance(prerequisites, str):
+        for doc, matches in matcher.pipe(return_matches=True,
+                                         batch_size=1000):
+            # yield standardable content
+            match_start = 0
+            for match in matches:
+                total_cases += 1
+                match_end = match[2]
+                print("\t", doc[match_start:match_end])
+                yield doc[match_start:match_end]
+                match_start = match[2]
+            yield doc[match_start:]
+    else:
+        total_cases += 1
+
+
+
+""" small_df2 = df.sample(n=N, random_state=random_state*2)
 
 # quick and dirty eval loop; random_seed = 42 for 100 samples had
 # 6 wrong, prodigy NER sheet recommends you use rule matchers if
@@ -87,4 +106,4 @@ doc = nlp(small_df.iloc[0].PREREQUISITES)
 matches = matcher(doc) #  [(14862748245026736845, 2, 3)] --> [or]
 
 # see: matcher.pipe
-# at https://spacy.io/api/matcher#pipe
+# at https://spacy.io/api/matcher#pipe """
