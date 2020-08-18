@@ -43,6 +43,21 @@ patterns =\
 matcher = Matcher(nlp.vocab)
 matcher.add("DoNotStandardize", patterns)
 
+BATCH_SIZE = 50
+
+small_df2.fillna('', inplace=True)
+
+def make_batch_of_docs(df, column_index=0, nlp=nlp, batch_size=BATCH_SIZE, disable=["parser","ner", "entity_linker"]):
+    yield nlp.pipe(df.iloc[:,column_index].values,
+                   batch_size=batch_size,
+                   disable=disable)
+
+
+def make_standardizable_matches():
+    pass
+
+
+
 total_cases = 0
 for row in small_df2.iterrows():
     prerequisites = row[1].PREREQUISITES

@@ -1,3 +1,78 @@
+This gives a tasks list of sorts for 
+    Standardization
+        Prerequisites
+        Abbreviations expanded (primarily technical products and industry terms)
+            carry forward into Description, FeatureDescription
+    Imputation (high accuracy only)
+
+
+
+----
+note: notes from meetin gare here
+https://docs.google.com/document/d/1GILK30dx7Mc4v7edsfB3qYgkSG4PrrxITaV0wi3uaTI/edit
+Was given VMWare scope, compared to my contract, got 
+
+Kwamata D4AD contract
+A	Prerequisite,
+B	TrainRoute1,
+C	NonGovApproval, 
+D	(New) Instruction Modality, 
+E	URL, 
+F	Name_1, 
+G	DOL-Type, 
+H	Name,
+I	Address, 
+J	CIP Code
+K	(New) course status/type
+L	(New) program status.
+M	Name
+(Note: (M) Name was not included but should be)
+—
+
+See: https://github.com/newjersey/d4ad/blob/master/backend/migrations/sqls/20200605145412-programs-up.sql
+VMWare Scope
+
+X, given	PROVIDERID
+M			OFFICIALNAME
+J,given		CIPCODE
+X,given		APPROVINGAGENCYID
+X,given		OTHERAGENCY
+X?			SUBMITTEDTOWIB
+X,given		TUITION
+X,given		FEES
+X,given		BOOKSMATERIALSCOST
+X,given		SUPPLIESTOOLSCOST
+X,given		OTHERCOSTS
+X,given		TOTALCOST
+A			PREREQUISITES
+Self		WIAELIGIBLE
+Self		LEADTODEGREE
+DegreeID	DEGREEAWARDED
+Self			LEADTOLICENSE <— Can induce license from CIP, industry requirements? Hard to say
+K,L?			LICENSEAWARDED <— Unsure; maybe see if description mentions?
+Self			LEADTOINDUSTRYCREDENTIAL <— Unsure; maybe see if description mentions?
+IndustryID	INDUSTRYCREDENTIAL <— Can induce prerequisites, from where unsure; ONET?
+Self			FINANCIALAID <— might indicate type/kind of program? Aid for cert are more rare?
+Name_1		DESCRIPTION
+Credits		CREDIT
+Self			TOTALCLOCKHOURS
+Self			CALENDARLENGTHID
+Self			FEATURESDESCRIPTION
+Self?		WIBCOMMENT <— might have useful data?
+Self			STATECOMMENT <— might have useful data?
+Self			SUBMITTED <— might have useful data
+UNK			APPROVED
+Self			CONTACTNAME
+Self			CONTACTPHONE
+Self			PHONEEXTENSION
+Self			PROGRAMID
+StatusID		STATUSNAME
+Self			id <— key
+
+
+
+
+---
 k, so next step is to stream out all the presquites as tokens
 and figure out what prodigy task would allow me to efficiently assign classes to them
 
