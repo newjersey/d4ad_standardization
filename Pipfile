@@ -13,11 +13,11 @@ ipython = "*"
 python-dotenv = "*"
 pandas = "*"
 xlrd = "*"
-spacy = {version = "*",extras = ["cuda92"]}
+spacy = {extras = ["cuda92"],version = "*"}
 missingno = "*"
 ipykernel = "*"
 jupyter = "*"
-ipykernal = "*"
+superintendent = "*"
 
 [requires]
 python_version = "3.7"
