@@ -17,6 +17,7 @@ spacy = {version = "*",extras = ["cuda92"]}
 missingno = "*"
 ipykernel = "*"
 jupyter = "*"
+ipykernal = "*"
 
 [requires]
 python_version = "3.7"

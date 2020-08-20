@@ -1,8 +1,21 @@
+
+Beenw orking out of my notebook more but
+I've been having issues with the jupyter server
+hanging on large cell runs when prior larger runs 
+ran fine. could be a buffer thing?
+
+Anyway, added 
+Host *
+IPQoS=throughput
+
+to my ssh/config
+---
 This gives a tasks list of sorts for 
     Standardization
-        Prerequisites
+        Prerequisites standardization
         Abbreviations expanded (primarily technical products and industry terms)
             carry forward into Description, FeatureDescription
+        Name <-- probably need a Google call?
     Imputation (high accuracy only)
 
 
@@ -19,7 +32,7 @@ C	NonGovApproval,
 D	(New) Instruction Modality, 
 E	URL, 
 F	Name_1, 
-G	DOL-Type, 
+G	DOL-Type, ??? WHere is this
 H	Name,
 I	Address, 
 J	CIP Code
@@ -33,7 +46,7 @@ See: https://github.com/newjersey/d4ad/blob/master/backend/migrations/sqls/20200
 VMWare Scope
 
 X, given	PROVIDERID
-M			OFFICIALNAME
+** M			OFFICIALNAME
 J,given		CIPCODE
 X,given		APPROVINGAGENCYID
 X,given		OTHERAGENCY
@@ -44,7 +57,7 @@ X,given		BOOKSMATERIALSCOST
 X,given		SUPPLIESTOOLSCOST
 X,given		OTHERCOSTS
 X,given		TOTALCOST
-A			PREREQUISITES
+** A			PREREQUISITES
 Self		WIAELIGIBLE
 Self		LEADTODEGREE
 DegreeID	DEGREEAWARDED
@@ -53,7 +66,7 @@ K,L?			LICENSEAWARDED <— Unsure; maybe see if description mentions?
 Self			LEADTOINDUSTRYCREDENTIAL <— Unsure; maybe see if description mentions?
 IndustryID	INDUSTRYCREDENTIAL <— Can induce prerequisites, from where unsure; ONET?
 Self			FINANCIALAID <— might indicate type/kind of program? Aid for cert are more rare?
-Name_1		DESCRIPTION
+** FeatureDescription, Name_1		DESCRIPTION
 Credits		CREDIT
 Self			TOTALCLOCKHOURS
 Self			CALENDARLENGTHID

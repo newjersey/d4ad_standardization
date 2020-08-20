@@ -1,7 +1,8 @@
 import spacy
 import pandas as pd
 from spacy.matcher import Matcher
-
+# todo: refactor to accept content or non-content matcher
+#           generate content from provided column using matcher
 nlp = spacy.load("en_core_web_lg")
 
 # todo: set as env variable for raw main table
@@ -57,7 +58,6 @@ def make_standardizable_matches():
     pass
 
 
-
 total_cases = 0
 for row in small_df2.iterrows():
     prerequisites = row[1].PREREQUISITES
@@ -76,6 +76,16 @@ for row in small_df2.iterrows():
     else:
         total_cases += 1
 
+# Importing the libraries 
+import pandas as pd 
+import missingno as msno 
+  
+# Loading the dataset 
+df = pd.read_csv("kamyr-digester.csv") 
+  
+# Visualize the number of missing 
+# values as a bar chart 
+msno.bar(df) 
 
 
 """ small_df2 = df.sample(n=N, random_state=random_state*2)
