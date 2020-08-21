@@ -18,6 +18,7 @@ missingno = "*"
 ipykernel = "*"
 jupyter = "*"
 superintendent = "*"
+statsmodels = "*"
 
 [requires]
 python_version = "3.7"
