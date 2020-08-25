@@ -19,6 +19,7 @@ ipykernel = "*"
 jupyter = "*"
 superintendent = "*"
 statsmodels = "*"
+xlwt = "*"
 
 [requires]
 python_version = "3.7"
