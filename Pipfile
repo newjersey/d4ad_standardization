@@ -21,6 +21,7 @@ superintendent = "*"
 statsmodels = "*"
 xlwt = "*"
 regex = "*"
+more-itertools = "*"
 
 [requires]
 python_version = "3.7"
