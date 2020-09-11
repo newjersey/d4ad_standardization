@@ -5,7 +5,8 @@ import datetime
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 import pandas as pd
-import regex  # for field identification
+import regex
+import re         # for field identification
 from utils.dataframe_manipulation import (
     replace_values,
     extract_values,
@@ -22,7 +23,8 @@ get_standardized =\
         'NAME': 'STANDARDIZED_NAME',
         'NAME_1': 'STANDARDIZED_NAME1',
         'DESCRIPTION': 'STANDARDIZED_DESCRIPTION',
-        'FEATURESDESCRIPTION': 'STANDARDIZED_FEATURESDESCRIPTION'
+        'FEATURESDESCRIPTION': 'STANDARDIZED_FEATURESDESCRIPTION',
+        "IS_WIOA": "MENTIONS_WIOA"
     }
 
 def input(from_filepath=None, from_table=None):
@@ -193,8 +195,9 @@ def mentions_wioa(from_df):
     wioa_indices =\
         get_name_name1_descriptions_indices(wioa_like, to_df)
 
-    to_df['IS_WIOA'] = False
-    to_df.loc[wioa_indices, 'IS_WIOA'] = True
+    field = get_standardized['IS_WIOA']
+    to_df[field] = False
+    to_df.loc[wioa_indices, field] = True
 
     return to_df
 
@@ -216,7 +219,6 @@ def mentions_certificate(from_df):
 
     return to_df
 
-
 def mentions_associates(from_df):
     to_df = from_df    
     as_like =\
@@ -237,8 +239,58 @@ def mentions_associates(from_df):
 
     return to_df
 
+def job_search_duration(from_df):
+    to_df = from_df
+    field = get_standardized['IS_WIOA']
+    wioa_indices = to_df[field] == True
+    to_df['DEFAULT_JOB_SEARCH_DURATION'] = "0"
+    to_df.loc[wioa_indices, 'DEFAULT_JOB_SEARCH_DURATION'] = "6 months"
 
+    # We first extract the context in which mentions of
+    # job searches occur (e.g. job search, assistance with employment search, etc.)
+    training_context_regex =\
+        """
+        ((\w+\W+){0,8}        # first 8 or so words before
+        (?P<job_search>job[\s\b.].*?search|assist[\w\s\b\.].*?employ\w*?\b) # help w/ job search
+        (\W+\w+){0,8})       # and last 8 or so word after
+        """
 
+    # ... then we search for specific mentions of numerically qualified durations,
+    # like four months. We take these as job search durations. Note there aren't
+    # very many of them.
+    numbers = "one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen"
+    durations = "minute|day|week|month|year"
+    duration_regex =\
+       f"""
+        (?P<numeric>\d|{numbers})       # numeric reference ...
+        (?P<modifer>.*)                 # followed by content that might modify ...
+        (?P<base_duration>{durations})     # ... the base duration
+        """
+
+    # todo: make this logic have fewer hardcoded things
+    job_search_length_mention =\
+        to_df.loc[wioa_indices, 'DESCRIPTION']\
+            .str\
+            .extractall(pat=training_context_regex, flags=re.I|re.VERBOSE)[0]
+
+    field = 'MENTIONED_JOB_SEARCH_DURATION'
+    to_df[field] = None
+    job_search_length_mention =\
+        job_search_length_mention.str.extract(
+            duration_regex,
+            flags=re.I|re.VERBOSE
+        ).replace('-', '')\
+        .replace('week', 'weeks')\
+        .dropna()\
+        .droplevel('match')  # drop uneeded multi-index 
+
+    to_df.loc[job_search_length_mention.index,
+              field] =\
+                job_search_length_mention['numeric'] +\
+                job_search_length_mention['modifer'] +\
+                job_search_length_mention['base_duration']
+    
+    return to_df
 
 
 @click.command()
@@ -269,6 +321,9 @@ def main(output_filepath, from_filepath, from_table):
     logger.info('... identifying associates')
     out_df =\
         mentions_associates(from_df=out_df)
+    logger.info('... job search durations')
+    out_df =\
+        job_search_duration(from_df=out_df)
 
     # temp: write this so we know what's going on
     write_out(out_df, output_filepath, content_is='test_output')
