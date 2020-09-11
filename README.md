@@ -16,7 +16,21 @@ pipenv shell
 pipenv install # wait a while for various packages to be installed
 
 python D4AD_Standardization/src/data/make_dataset.py
-# examine the output standardized_etpl.csv file in ./D4AD_Standardization/data/interim/
+# 
+#2020-09-11 11:51:32,835 - __main__ - INFO - Making final data set from raw data
+#2020-09-11 11:51:32,835 - __main__ - INFO - ... standardizing course names
+#2020-09-11 11:51:39,271 - __main__ - INFO - ... standardizing provider names
+#2020-09-11 11:51:39,891 - __main__ - INFO - ... standardizing abbreviations throughout ... will take a while ...
+#2020-09-11 11:51:39,891 - __main__ - INFO - 	[abbreviation] starting at 2020-09-11 11:51:39.891658
+#2020-09-11 11:54:20,586 - __main__ - INFO - 	[abbreviation] stopped at 2020-09-11 11:54:20.586612
+#2020-09-11 11:54:20,586 - __main__ - INFO - 	[abbreviation] took 0:02:40.694954 time
+#2020-09-11 11:54:20,586 - __main__ - INFO - ... identifying WIOA funded courses
+#2020-09-11 11:54:25,351 - __main__ - INFO - ... identifying certficate courses
+#2020-09-11 11:54:26,820 - __main__ - INFO - ... identifying associates
+#2020-09-11 11:54:27,844 - __main__ - INFO - ... job search durations
+
+#
+# Now, examine the output standardized_etpl.csv file in ./D4AD_Standardization/data/interim/
 # Standardized fields are prefixed with the word 'STANDARDIZED'; new fields (such as WIOA indicators) are
 # new.
 ```
