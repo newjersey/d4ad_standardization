@@ -4,4 +4,4 @@ from .dataframe_manipulation import (
     split_on,
     write_out
 )
-
+from .abbreviation import multiple_mapper
