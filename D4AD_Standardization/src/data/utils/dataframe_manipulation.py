@@ -35,10 +35,3 @@ def write_out(the_df, write_path, content_is, root_path=ROOT_PATH, file_type=".c
         the_df.to_csv(root_path + write_path + f"{content_is}.{file_type}",
               index = False,
               chunksize = 10000)
-
-
-# technically not manipulation, but this type of search happens a lot
-def indices_from_regex_search(the_series, the_regex):
-    return the_series.dropna()\
-                     .map(the_regex.search)\
-                     .dropna().index

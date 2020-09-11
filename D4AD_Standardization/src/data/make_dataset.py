@@ -10,10 +10,10 @@ from utils.dataframe_manipulation import (
     replace_values,
     extract_values,
     split_on,
-    write_out,
-    indices_from_regex_search
+    write_out
 )
 from utils.abbreviation import multiple_mapper
+from utils.field_indicator import get_name_name1_descriptions_indices
 
 logger = logging.getLogger(__name__)
 
@@ -190,44 +190,53 @@ def mentions_wioa(from_df):
             ''',
             flags=regex.I|regex.VERBOSE)
 
-    # The below isn't quite DRY but it is easier to read/understand
-    name =\
-        indices_from_regex_search(
-            to_df['NAME'],
-            wioa_like
-        )
+    wioa_indices =\
+        get_name_name1_descriptions_indices(wioa_like, to_df)
 
-    name_1 =\
-        indices_from_regex_search(
-            to_df['NAME_1'],
-            wioa_like
-        )
-
-    descriptions =\
-        indices_from_regex_search(
-            to_df['DESCRIPTION'],
-            wioa_like
-        )
-
-    features_description =\
-        indices_from_regex_search(
-            to_df['FEATURESDESCRIPTION'],
-            wioa_like
-        )
-
-    wioa_indices = name.union(name_1)\
-                       .union(descriptions)\
-                       .union(features_description)
     to_df['IS_WIOA'] = False
     to_df.loc[wioa_indices, 'IS_WIOA'] = True
 
     return to_df
 
 def mentions_certificate(from_df):
-    pass
+    to_df = from_df
+    cert_like =\
+        regex.compile(
+            '''
+            (certification)
+            |(certificate)
+            |[\s\b](cert)[\s\b]
+            ''',
+            flags=regex.I|regex.VERBOSE)
+    cert_indices =\
+        get_name_name1_descriptions_indices(cert_like, to_df)
+
+    to_df['Mentioned_Certificate'] = False
+    to_df.loc[cert_indices, 'Mentioned_Certificate'] = True
+
+    return to_df
+
 
 def mentions_associates(from_df):
-    pass
+    to_df = from_df    
+    as_like =\
+        regex.compile(
+            '''
+            [\b\s](A\.A\.S\.)[\b\s]
+            |[\b\s](A\.S\.)[\b\s]
+            |[\b\s](AS\sDe)                   # AS Degree
+            |[\b\s](AS\sSc)                   # AS Science
+            |[\b\s](AAS)[\b\s]                # applied associates of science
+            ''',
+            flags=regex.VERBOSE)
+    assoc_indices =\
+        get_name_name1_descriptions_indices(as_like, to_df)
+
+    to_df['Mentioned_Associates'] = False
+    to_df.loc[assoc_indices, 'Mentioned_Associates'] = True
+
+    return to_df
+
 
 
 
@@ -254,6 +263,12 @@ def main(output_filepath, from_filepath, from_table):
     logger.info('... identifying WIOA funded courses')
     out_df =\
         mentions_wioa(from_df=out_df)
+    logger.info('... identifying certficate courses')
+    out_df =\
+        mentions_certificate(from_df=out_df)
+    logger.info('... identifying associates')
+    out_df =\
+        mentions_associates(from_df=out_df)
 
     # temp: write this so we know what's going on
     write_out(out_df, output_filepath, content_is='test_output')
