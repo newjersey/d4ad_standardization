@@ -310,8 +310,8 @@ def main(output_filepath, from_filepath, from_table):
     out_df =\
         provider_name(from_df=out_df)
     logger.info('... standardizing abbreviations throughout ... will take a while ...')        
-    #out_df =\
-    #    handle_abbreviations(from_df=out_df)
+    out_df =\
+       handle_abbreviations(from_df=out_df)
     logger.info('... identifying WIOA funded courses')
     out_df =\
         mentions_wioa(from_df=out_df)
@@ -326,7 +326,7 @@ def main(output_filepath, from_filepath, from_table):
         job_search_duration(from_df=out_df)
 
     # temp: write this so we know what's going on
-    write_out(out_df, output_filepath, content_is='test_output')
+    write_out(out_df, output_filepath, content_is='standardized_etpl')
 
 
 

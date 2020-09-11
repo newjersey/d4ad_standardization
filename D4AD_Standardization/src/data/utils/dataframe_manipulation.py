@@ -30,7 +30,7 @@ def split_on(the_series, split_on_string, n=1, get_first_n_results=1):
             n=n
         )[:get_first_n_results]
 
-def write_out(the_df, write_path, content_is, root_path=ROOT_PATH, file_type=".csv"):
+def write_out(the_df, write_path, content_is, root_path=ROOT_PATH, file_type="csv"):
     if '.csv' == file_type:
         the_df.to_csv(root_path + write_path + f"{content_is}.{file_type}",
               index = False,
