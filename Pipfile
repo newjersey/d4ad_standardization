@@ -13,7 +13,7 @@ ipython = "*"
 python-dotenv = "*"
 pandas = "*"
 xlrd = "*"
-spacy = {version = "*",extras = ["cuda92"]}
+spacy = "*"
 missingno = "*"
 ipykernel = "*"
 jupyter = "*"
