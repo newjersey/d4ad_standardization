@@ -17,7 +17,6 @@ pipenv install # wait a while for various packages to be installed
 
 python D4AD_Standardization/src/data/make_dataset.py
 # 
-# (d4ad_standardization) kwame@Puget-168695:/hdd/work/d4ad_standardization$ python D4AD_Standardization/src/data/make_dataset.py 
 #2020-09-11 11:51:32,835 - __main__ - INFO - Making final data set from raw data
 #2020-09-11 11:51:32,835 - __main__ - INFO - ... standardizing course names
 #2020-09-11 11:51:39,271 - __main__ - INFO - ... standardizing provider names
