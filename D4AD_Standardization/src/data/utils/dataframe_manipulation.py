@@ -1,0 +1,35 @@
+import pandas as pd
+import re
+
+ROOT_PATH = "/hdd/work/d4ad_standardization/"
+
+# We establish a common api on which to manipulate dataframes
+# these are mostly pass through but make code more DRY and
+# include common defaults for this application
+
+def replace_values(the_series, to_replace, value=""):
+    return \
+        the_series.str.replace(
+            to_replace,
+            value
+        )
+
+def extract_values(the_series, pat, flags=re.VERBOSE):
+    return \
+        the_series.str.extract(
+            pat=pat,
+            flags=flags
+        )
+
+def split_on(the_series, split_on_string, n=1, get_first_n_results=1):
+    return \
+        the_series.str.split(
+            split_on_string,
+            n=n
+        )[:get_first_n_results]
+
+def write_out(the_df, write_path, content_is, root_path=ROOT_PATH, file_type=".csv"):
+    if '.csv' == file_type:
+        the_df.to_csv(root_path + write_path + f"{content_is}.{file_type}",
+              index = False,
+              chunksize = 10000)

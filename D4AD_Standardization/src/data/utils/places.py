@@ -3,14 +3,12 @@ import googlemaps
 from googlemaps.types import GeneratorType
 import googlemaps import responses
 
-
 ENV_GOOGLE_MAP_API_KEY = "GOOGLE_API_KEY"
 class Gmap(object):
     # see: types, https://developers.google.com/places/supported_types:
     # see: https://developers.google.com/places/web-service/details
     def __init__(self, address=True, name=True, url=True, place_types=['school','university']):
         self.api_url = "https://maps.googleapis.com/maps/api/place/details/
-        #self.api_url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
         self.key = os.environ.get("ENV_GOOGLE_MAP_API_KEY")
         self.client = googlemaps.Client(self.key)
         self.place_types = place_types # I assume multiple can be used
@@ -67,5 +65,3 @@ class Gmap(object):
 
             # TODO: break out response
             # ntoe that client has callbacks, rate limiting
-
-            response =
