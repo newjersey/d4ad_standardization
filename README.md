@@ -1,7 +1,34 @@
 # d4ad-standardization
 Data 4 American Dream (D4AD) standardization code for innovateNJ contract. See: https://d4ad.com/ for more details.
 
-## Instructions for Standalone Generation of Standardized data
+## Instructions for standalone generation from `make_dataset.py`
+These instructions produce a standardized version of D4AD provider data. First the environment must be set up (e.g. python environment, with libraries) and then a series of notebooks run.
+
+## Setup/Assumptions
+* This project is cloned, e.g. `git clone https://github.com/robinsonkwame/d4ad_standardization/`
+* A current excel spreadsheet of D4AD provider data, with unstandardized columns of data, is copied to `.D4AD_Standardization/data/raw`, e.g. `etpl_all_programsJune3.xls`
+* The `pipenv` package is available and how to install it [can be found here](https://docs.pipenv.org/)
+
+## How to Run
+```
+# at ./d4ad_standardization
+pipenv shell
+pipenv install # wait a while for various packages to be installed
+
+python D4AD_Standardization/src/data/make_dataset.py
+# examine the output standardized_etpl.csv file in ./D4AD_Standardization/data/interim/
+# Standardized fields are prefixed with the word 'STANDARDIZED'; new fields (such as WIOA indicators) are
+# new.
+```
+
+## TODOS
+
+See any and all open issues.
+
+
+--------
+
+## Instructions for standalone generation from ipython notebooks
 These instructions iteratively produce standardized version of D4AD provider data. First the environment must be set up (e.g. python environment, with libraries) and then a series of notebooks run. @kwame is currently refactoring the notebooks into a single source file that pulls in a set of modules so that this process is much simpler. But currently this is the procedure for running (note: only been tested on Kwame's machine, some revisions may be needed):
 
 ## Setup/Assumptions
