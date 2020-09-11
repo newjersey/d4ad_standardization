@@ -5,11 +5,13 @@ import datetime
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 import pandas as pd
+import regex  # for field identification
 from utils.dataframe_manipulation import (
     replace_values,
     extract_values,
     split_on,
-    write_out
+    write_out,
+    indices_from_regex_search
 )
 from utils.abbreviation import multiple_mapper
 
@@ -122,9 +124,32 @@ def provider_name(from_df):
     to_df.loc[no_parenthesis_index, standardized_field] =\
         to_df.loc[no_parenthesis_index, field]
 
+    # ... now we remove degree related mentions that are left over
+    degree_cert_variants =\
+        ["A.S.",
+        "AAS Degree",
+        "AAS -",
+        "A.S. Degree",
+        "AS Degree",     
+        "Degree",
+        "degree",
+        "certificate",
+        "Certificate",
+        "Associate of Applied Science",
+        "-[\s\b]Associate",
+        "^\s*In\b"]
+
+    # to_df[standardized_field] =\
+    #     replace_values(to_df[standardized_field],
+    #                    degree_cert_variants,
+    #                    regex=True)
+    # I don't know why the above doesn't accept the list when it
+    # internally calls the same function below...
+    to_df[standardized_field] =\
+        to_df[standardized_field].replace(degree_cert_variants, "", regex=True)
+
     return to_df
 
-# This is waht 5.0 does butnot sure if well where picked up
 def handle_abbreviations(from_df):
     # "Gold" (or Better) Version of fields
     #
@@ -134,8 +159,6 @@ def handle_abbreviations(from_df):
     # so it can take a while. I've used regexs, which are in C
     # should be about as fast as possible.
     to_df = from_df
-    field = 'NAME_1'
-    standardized_field = get_standardized[field]
 
     # write timing to log
     start = datetime.datetime.now()
@@ -156,6 +179,59 @@ def handle_abbreviations(from_df):
     logger.info(f"\t[abbreviation] took {(end-start)} time")
     return to_df
 
+def mentions_wioa(from_df):
+    to_df = from_df
+
+    wioa_like =\
+        regex.compile(
+            '''
+            (title\s+[IV1234]+\b\s*?)           # WOIA has 4 titles of funding in law, at end of sentence or space
+            |(wioa){d<=1}                       # is called WOIA, WIA, allowed to miss a letter
+            ''',
+            flags=regex.I|regex.VERBOSE)
+
+    # The below isn't quite DRY but it is easier to read/understand
+    name =\
+        indices_from_regex_search(
+            to_df['NAME'],
+            wioa_like
+        )
+
+    name_1 =\
+        indices_from_regex_search(
+            to_df['NAME_1'],
+            wioa_like
+        )
+
+    descriptions =\
+        indices_from_regex_search(
+            to_df['DESCRIPTION'],
+            wioa_like
+        )
+
+    features_description =\
+        indices_from_regex_search(
+            to_df['FEATURESDESCRIPTION'],
+            wioa_like
+        )
+
+    wioa_indices = name.union(name_1)\
+                       .union(descriptions)\
+                       .union(features_description)
+    to_df['IS_WIOA'] = False
+    to_df.loc[wioa_indices, 'IS_WIOA'] = True
+
+    return to_df
+
+def mentions_certificate(from_df):
+    pass
+
+def mentions_associates(from_df):
+    pass
+
+
+
+
 @click.command()
 @click.argument('output_filepath', type=click.Path(), default="./D4AD_Standardization/data/interim/")
 @click.argument('from_filepath', type=click.Path(exists=True), default="./D4AD_Standardization/data/raw/etpl_all_programsJune3.xls")
@@ -173,8 +249,11 @@ def main(output_filepath, from_filepath, from_table):
     out_df =\
         provider_name(from_df=out_df)
     logger.info('... standardizing abbreviations throughout ... will take a while ...')        
+    #out_df =\
+    #    handle_abbreviations(from_df=out_df)
+    logger.info('... identifying WIOA funded courses')
     out_df =\
-        handle_abbreviations(from_df=out_df)
+        mentions_wioa(from_df=out_df)
 
     # temp: write this so we know what's going on
     write_out(out_df, output_filepath, content_is='test_output')

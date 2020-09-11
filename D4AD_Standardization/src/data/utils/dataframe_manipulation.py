@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import regex
 
 ROOT_PATH = "/hdd/work/d4ad_standardization/"
 
@@ -7,11 +8,12 @@ ROOT_PATH = "/hdd/work/d4ad_standardization/"
 # these are mostly pass through but make code more DRY and
 # include common defaults for this application
 
-def replace_values(the_series, to_replace, value=""):
+def replace_values(the_series, to_replace, value="", regex=False):
     return \
         the_series.str.replace(
             to_replace,
-            value
+            value,
+            regex=regex
         )
 
 def extract_values(the_series, pat, flags=re.VERBOSE):
@@ -33,3 +35,10 @@ def write_out(the_df, write_path, content_is, root_path=ROOT_PATH, file_type=".c
         the_df.to_csv(root_path + write_path + f"{content_is}.{file_type}",
               index = False,
               chunksize = 10000)
+
+
+# technically not manipulation, but this type of search happens a lot
+def indices_from_regex_search(the_series, the_regex):
+    return the_series.dropna()\
+                     .map(the_regex.search)\
+                     .dropna().index
