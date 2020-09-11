@@ -139,17 +139,21 @@ def handle_abbreviations(from_df):
 
     # write timing to log
     start = datetime.datetime.now()
-    logger.info(f"\tStarting at {start}")
+    logger.info(f"\t[abbreviation] starting at {start}")
 
-    the_fields = ['NAME_1', 'DESCRIPTION', 'STANDARDIZED_DESCRIPTION']
+    the_fields = [get_standardized['NAME_1'],
+                  'DESCRIPTION', 
+                  'FEATURESDESCRIPTION']
     for a_field in the_fields:
-        standardized_field = get_standardized[a_field]
+        # get the standardized field if it exists, else returns same field
+        # so we can self-modify it
+        standardized_field = get_standardized.get(a_field, a_field)
         to_df[standardized_field] =\
             to_df[a_field].dropna().map(multiple_mapper)
     end = datetime.datetime.now()
 
-    logger.info(f"\tStopped at {end}")
-    logger.info(f"\ttook {(end-start)} time")
+    logger.info(f"\t[abbreviation] stopped at {end}")
+    logger.info(f"\t[abbreviation] took {(end-start)} time")
     return to_df
 
 @click.command()
