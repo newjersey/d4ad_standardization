@@ -241,6 +241,7 @@ def mentions_associates(from_df):
 
 def job_search_duration(from_df):
     to_df = from_df
+    
     field = get_standardized['IS_WIOA']
     wioa_indices = to_df[field] == True
     to_df['DEFAULT_JOB_SEARCH_DURATION'] = "0"
@@ -326,6 +327,9 @@ def main(output_filepath, from_filepath, from_table):
         job_search_duration(from_df=out_df)
 
     # temp: write this so we know what's going on
+    content_is='standardized_etpl'
+    logger.info(f"Done. Writing {content_is} to {output_filepath}")
+
     write_out(out_df, output_filepath, content_is='standardized_etpl')
 
 
