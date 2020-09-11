@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import click
 import logging
+import datetime
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 import pandas as pd
@@ -12,10 +13,14 @@ from utils.dataframe_manipulation import (
 )
 from utils.abbreviation import multiple_mapper
 
+logger = logging.getLogger(__name__)
+
 get_standardized =\
     {
         'NAME': 'STANDARDIZED_NAME',
-        'NAME_1': 'STANDARDIZED_NAME1'
+        'NAME_1': 'STANDARDIZED_NAME1',
+        'DESCRIPTION': 'STANDARDIZED_DESCRIPTION',
+        'FEATURESDESCRIPTION': 'STANDARDIZED_FEATURESDESCRIPTION'
     }
 
 def input(from_filepath=None, from_table=None):
@@ -123,15 +128,28 @@ def provider_name(from_df):
 def handle_abbreviations(from_df):
     # "Gold" (or Better) Version of fields
     #
-    # Here we need to expand out abbreviations that are used
-    # this promotes readabilty, understanding of what
+    # Here we need to expand out abbreviations that are used;
+    # this promotes readabilty, understanding of what. Note
+    # that this process replaces multiple abbrecations within a given string
+    # so it can take a while. I've used regexs, which are in C
+    # should be about as fast as possible.
     to_df = from_df
     field = 'NAME_1'
     standardized_field = get_standardized[field]
 
-    to_df['MULTI_REPLACE_STANDARDIZEDNAME_1'] =\
-        to_df[standardized_field].dropna().map(multiple_mapper) # ~ 26k rows/10 seconds
+    # write timing to log
+    start = datetime.datetime.now()
+    logger.info(f"\tStarting at {start}")
 
+    the_fields = ['NAME_1', 'DESCRIPTION', 'STANDARDIZED_DESCRIPTION']
+    for a_field in the_fields:
+        standardized_field = get_standardized[a_field]
+        to_df[standardized_field] =\
+            to_df[a_field].dropna().map(multiple_mapper)
+    end = datetime.datetime.now()
+
+    logger.info(f"\tStopped at {end}")
+    logger.info(f"\ttook {(end-start)} time")
     return to_df
 
 @click.command()
@@ -142,13 +160,15 @@ def main(output_filepath, from_filepath, from_table):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
-    logger = logging.getLogger(__name__)
-    logger.info('... making final data set from raw data')
+    logger.info('Making final data set from raw data')
 
+    logger.info('... standardizing course names')
     out_df =\
         course_name(from_df=input(from_filepath, from_table))
+    logger.info('... standardizing provider names')
     out_df =\
         provider_name(from_df=out_df)
+    logger.info('... standardizing abbreviations throughout ... will take a while ...')        
     out_df =\
         handle_abbreviations(from_df=out_df)
 
