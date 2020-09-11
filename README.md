@@ -1,7 +1,7 @@
 # d4ad-standardization
 Data 4 American Dream (D4AD) standardization code for innovateNJ contract. See: https://d4ad.com/ for more details.
 
-## Instructions for Standalone Production Standardized data
+## Instructions for Standalone Generation of Standardized data
 These instructions iteratively produce standardized version of D4AD provider data. First the environment must be set up (e.g. python environment, with libraries) and then a series of notebooks run. @kwame is currently refactoring the notebooks into a single source file that pulls in a set of modules so that this process is much simpler. But currently this is the procedure for running (note: only been tested on Kwame's machine, some revisions may be needed):
 
 ## Setup/Assumptions
