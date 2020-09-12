@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 rq = "*"
 cookiecutter = "*"
+click = "*"
 googlemaps = "*"
 ipython = "*"
 python-dotenv = "*"
