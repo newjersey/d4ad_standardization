@@ -15,6 +15,11 @@ from utils.dataframe_manipulation import (
 )
 from utils.abbreviation import multiple_mapper
 from utils.field_indicator import get_name_name1_descriptions_indices
+from utils.etpl_field_names import (
+    sql_etpl_field_names,
+    sql_excel_field_map
+)
+
 
 logger = logging.getLogger(__name__)
 
@@ -27,13 +32,26 @@ get_standardized =\
         "IS_WIOA": "MENTIONS_WIOA"
     }
 
-def input(from_filepath=None, from_table=None):
+def input_source(from_filepath=None, from_table=None, remap_field_names=False):
     df = None
     if from_filepath:
         file_extension = from_filepath.rsplit('.',1)[1]
         
         if file_extension in ('xls', 'xlsx'):
             df = pd.read_excel(from_filepath)
+
+    if remap_field_names:
+        sql_fields_in_common = sql_etpl_field_names.intersection(
+            set(df.columns)
+            )
+        if len(sql_fields_in_common) > 0:
+            # we remap to excel fields since this work was
+            # predicated on the inital excel dump provided to me
+            # at start of contract
+            df =\
+                df.rename(
+                    columns=sql_excel_field_map
+                )
 
     return df
 
@@ -295,18 +313,26 @@ def job_search_duration(from_df):
 
 
 @click.command()
+@click.argument('remap_field_names', default=True)
 @click.argument('output_filepath', type=click.Path(), default="./D4AD_Standardization/data/interim/")
-@click.argument('from_filepath', type=click.Path(exists=True), default="./D4AD_Standardization/data/raw/etpl_all_programsJune3.xls")
+#@click.argument('from_filepath', type=click.Path(exists=True), default="./D4AD_Standardization/data/raw/sql_header_etpl_small_June3.xls")
+#@click.argument('from_filepath', type=click.Path(exists=True), default="./D4AD_Standardization/data/raw/etpl_all_programsJune3.xls")
+@click.argument('from_filepath', type=click.Path(exists=True), default="./D4AD_Standardization/data/raw/sql_header_etpl_all_programsJune3.xls")
 @click.argument('from_table', type=str, default='')
-def main(output_filepath, from_filepath, from_table):
+def main(remap_field_names, output_filepath, from_filepath, from_table):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger.info('Making final data set from raw data')
 
+    remap_field_names = remap_field_names
+
+    logger.info(f"... reading in input dataset, remap field names is set to {remap_field_names}")
+    from_df = input_source(from_filepath, from_table, remap_field_names=remap_field_names)
     logger.info('... standardizing course names')
+    
     out_df =\
-        course_name(from_df=input(from_filepath, from_table))
+        course_name(from_df=from_df)
     logger.info('... standardizing provider names')
     out_df =\
         provider_name(from_df=out_df)
@@ -326,12 +352,10 @@ def main(output_filepath, from_filepath, from_table):
     out_df =\
         job_search_duration(from_df=out_df)
 
-    # temp: write this so we know what's going on
     content_is='standardized_etpl'
-    logger.info(f"Done. Writing {content_is} to {output_filepath}")
+    logger.info(f"Done. Writing {content_is} to {output_filepath}. Remap fields names is {remap_field_names}")
 
-    write_out(out_df, output_filepath, content_is='standardized_etpl')
-
+    write_out(out_df, output_filepath, content_is='standardized_etpl', remap_field_names=remap_field_names)
 
 
 if __name__ == '__main__':
