@@ -2,9 +2,10 @@ import pandas as pd
 import re
 import regex
 import logging
-from .etpl_field_names import excel_to_sql_name_map, sql_type_map
+import os
+# from .etpl_field_names import excel_to_sql_name_map, sql_type_map
 
-ROOT_PATH = "/hdd/work/d4ad_standardization/"
+ROOT_PATH = os.getcwd() + "/"
 
 logger = logging.getLogger(__name__)
 

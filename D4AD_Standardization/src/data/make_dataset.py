@@ -15,21 +15,29 @@ from utils.dataframe_manipulation import (
 )
 from utils.abbreviation import multiple_mapper
 from utils.field_indicator import get_name_name1_descriptions_indices
-from utils.etpl_field_names import (
-    sql_etpl_field_names,
-    sql_excel_field_map
-)
+# from utils.etpl_field_names import (
+#     sql_etpl_field_names,
+#     sql_excel_field_map
+# )
 
 
 logger = logging.getLogger(__name__)
 
+# DEFINE COLUMNS
+provider_name_field = 'name'
+program_name_field = 'officialname'
+description_field = 'description'
+feature_description_field = 'featuresdescription'
+is_wioa_field = 'wiaeligible'
+
+
 get_standardized =\
     {
-        'NAME': 'STANDARDIZED_NAME',
-        'NAME_1': 'STANDARDIZED_NAME1',
-        'DESCRIPTION': 'STANDARDIZED_DESCRIPTION',
-        'FEATURESDESCRIPTION': 'STANDARDIZED_FEATURESDESCRIPTION',
-        "IS_WIOA": "MENTIONS_WIOA"
+        program_name_field: 'STANDARDIZED_NAME',
+        provider_name_field: 'STANDARDIZED_NAME1',
+        description_field: 'STANDARDIZED_DESCRIPTION',
+        feature_description_field: 'STANDARDIZED_FEATURESDESCRIPTION',
+        is_wioa_field: "MENTIONS_WIOA"
     }
 
 def input_source(from_filepath=None, from_table=None, remap_field_names=False):
@@ -39,6 +47,9 @@ def input_source(from_filepath=None, from_table=None, remap_field_names=False):
         
         if file_extension in ('xls', 'xlsx'):
             df = pd.read_excel(from_filepath)
+
+        if file_extension in ('csv'):
+            df = pd.read_csv(from_filepath)
 
     if remap_field_names:
         sql_fields_in_common = sql_etpl_field_names.intersection(
@@ -58,7 +69,7 @@ def input_source(from_filepath=None, from_table=None, remap_field_names=False):
 
 def course_name(from_df):
     to_df = from_df
-    field = 'NAME'
+    field = program_name_field
 
     # First we remove extranous content after the hyphen
     # e.g. "Program Management[ - Clemsen - A.S. Title IV]"
@@ -93,7 +104,7 @@ def course_name(from_df):
 
 def provider_name(from_df):
     to_df = from_df
-    field = 'NAME_1'
+    field = provider_name_field
     standardized_field = get_standardized[field]
 
     # Silver Version of Provider Names
@@ -184,9 +195,9 @@ def handle_abbreviations(from_df):
     start = datetime.datetime.now()
     logger.info(f"\t[abbreviation] starting at {start}")
 
-    the_fields = [get_standardized['NAME_1'],
-                  'DESCRIPTION', 
-                  'FEATURESDESCRIPTION']
+    the_fields = [get_standardized[provider_name_field],
+                  description_field,
+                  feature_description_field]
     for a_field in the_fields:
         # get the standardized field if it exists, else returns same field
         # so we can self-modify it
@@ -213,7 +224,7 @@ def mentions_wioa(from_df):
     wioa_indices =\
         get_name_name1_descriptions_indices(wioa_like, to_df)
 
-    field = get_standardized['IS_WIOA']
+    field = get_standardized[is_wioa_field]
     to_df[field] = False
     to_df.loc[wioa_indices, field] = True
 
@@ -260,7 +271,7 @@ def mentions_associates(from_df):
 def job_search_duration(from_df):
     to_df = from_df
     
-    field = get_standardized['IS_WIOA']
+    field = get_standardized[is_wioa_field]
     wioa_indices = to_df[field] == True
     to_df['DEFAULT_JOB_SEARCH_DURATION'] = "0"
     to_df.loc[wioa_indices, 'DEFAULT_JOB_SEARCH_DURATION'] = "6 months"
@@ -288,7 +299,7 @@ def job_search_duration(from_df):
 
     # todo: make this logic have fewer hardcoded things
     job_search_length_mention =\
-        to_df.loc[wioa_indices, 'DESCRIPTION']\
+        to_df.loc[wioa_indices, description_field]\
             .str\
             .extractall(pat=training_context_regex, flags=re.I|re.VERBOSE)[0]
 
@@ -313,11 +324,11 @@ def job_search_duration(from_df):
 
 
 @click.command()
-@click.argument('remap_field_names', default=True)
+@click.argument('remap_field_names', default=False)
 @click.argument('output_filepath', type=click.Path(), default="./D4AD_Standardization/data/interim/")
 #@click.argument('from_filepath', type=click.Path(exists=True), default="./D4AD_Standardization/data/raw/sql_header_etpl_small_June3.xls")
 #@click.argument('from_filepath', type=click.Path(exists=True), default="./D4AD_Standardization/data/raw/etpl_all_programsJune3.xls")
-@click.argument('from_filepath', type=click.Path(exists=True), default="./D4AD_Standardization/data/raw/sql_header_etpl_all_programsJune3.xls")
+@click.argument('from_filepath', type=click.Path(exists=True), default="./D4AD_Standardization/data/raw/combined.csv")
 @click.argument('from_table', type=str, default='')
 def main(remap_field_names, output_filepath, from_filepath, from_table):
     """ Runs data processing scripts to turn raw data from (../raw) into
