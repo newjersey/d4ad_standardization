@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import re
 import regex
@@ -8,7 +9,7 @@ from .etpl_field_names import (
     internal_fields_to_labor
 )
 
-ROOT_PATH = "/hdd/work/d4ad_standardization/"
+ROOT_PATH = os.getcwd() + "/"
 
 logger = logging.getLogger(__name__)
 
