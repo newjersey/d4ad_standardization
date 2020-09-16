@@ -2,7 +2,11 @@ import pandas as pd
 import re
 import regex
 import logging
-from .etpl_field_names import excel_to_sql_name_map, sql_type_map
+from .etpl_field_names import (
+    excel_to_sql_name_map,
+    sql_type_map,
+    internal_fields_to_labor
+)
 
 ROOT_PATH = "/hdd/work/d4ad_standardization/"
 
@@ -27,20 +31,21 @@ def extract_values(the_series, pat, flags=re.VERBOSE):
             flags=flags
         )
 
-def split_on(the_series, split_on_string, n=1, get_first_n_results=1):
+def split_on(the_series, split_on_string, n=1, get_nth_result=1):
     return \
         the_series.str.split(
             split_on_string,
-            n=n
-        )[:get_first_n_results]
+            n=n,
+            expand=True
+        ).iloc[:,:get_nth_result]
 
 def write_out(the_df, write_path, content_is, root_path=ROOT_PATH,
-              file_type="csv", remap_field_names=False):
+              file_type="csv", remap_field_names=False, remapper=None):
 
     if remap_field_names:
         the_df =\
             the_df.rename(
-                columns=excel_to_sql_name_map
+                columns=remapper
             )
         for field_name, sql_type in sql_type_map.items():
             if sql_type == "boolean":
