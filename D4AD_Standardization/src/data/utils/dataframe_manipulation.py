@@ -55,6 +55,19 @@ def write_out(the_df, write_path, content_is, root_path=ROOT_PATH,
                 the_df.loc[make_false, field_name] = False
                 the_df.loc[~make_false, field_name] = True
 
+    # Pandas does not default to nullable integers on read_csv
+    # So we attempt type inference with the following
+    numeric_columns = df.select_dtypes(include='number')
+
+    for column in numeric_columns:
+        looks_like_integer = (df[column].fillna(1) % 1 == 0).all()
+        if looks_like_integer:
+            # then we have integers that were converted to float because
+            # we also have NaNs. We convert to special integer type
+            # that can handle NaNs, instead.
+            df[column] =\
+                df[column].astype('Int64')    
+
     if 'csv' == file_type:
         logger.info(f" ... writing to " + root_path + write_path + f"{content_is}.{file_type}")
         the_df.to_csv(root_path + write_path + f"{content_is}.{file_type}",
