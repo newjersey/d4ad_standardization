@@ -7,15 +7,15 @@ from dotenv import find_dotenv, load_dotenv
 import pandas as pd
 import regex
 import re         # for field identification
-from utils.dataframe_manipulation import (
+from .utils.dataframe_manipulation import (
     replace_values,
     extract_values,
     split_on,
     write_out
 )
-from utils.abbreviation import multiple_mapper
-from utils.field_indicator import get_name_name1_descriptions_indices
-from utils.etpl_field_names import (
+from .utils.abbreviation import multiple_mapper
+from .utils.field_indicator import get_name_name1_descriptions_indices
+from .utils.etpl_field_names import (
     sql_etpl_field_names,
     sql_excel_field_map,
     labor_fields_to_internal,
@@ -54,8 +54,8 @@ def input_source(from_filepath=None, from_table=None, remap_field_names=False, s
         if file_extension in ('xls', 'xlsx'):
             df = pd.read_excel(from_filepath)
         if file_extension in ('csv'):
-            df = pd.read_csv(from_filepath)
-        
+            df = pd.read_csv(from_filepath, dtype=str)
+
         # We ignore case by lowercasing all column names (e.g. labor gives
         # different casing than sql, etc)
         df.columns = map(str.lower, df.columns)

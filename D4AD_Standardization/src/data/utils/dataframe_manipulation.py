@@ -42,7 +42,6 @@ def split_on(the_series, split_on_string, n=1, get_nth_result=1):
 
 def write_out(the_df, write_path, content_is, root_path=ROOT_PATH,
               file_type="csv", remap_field_names=False, remapper=None):
-
     if remap_field_names:
         the_df =\
             the_df.rename(
