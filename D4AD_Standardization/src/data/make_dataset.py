@@ -2,20 +2,22 @@
 import click
 import logging
 import datetime
+import numpy as np
 from pathlib import Path
+from urllib.parse import quote_plus
 from dotenv import find_dotenv, load_dotenv
 import pandas as pd
 import regex
 import re         # for field identification
-from .utils.dataframe_manipulation import (
+from utils.dataframe_manipulation import (
     replace_values,
     extract_values,
     split_on,
     write_out
 )
-from .utils.abbreviation import multiple_mapper
-from .utils.field_indicator import get_name_name1_descriptions_indices
-from .utils.etpl_field_names import (
+from utils.abbreviation import multiple_mapper
+from utils.field_indicator import get_name_name1_descriptions_indices
+from utils.etpl_field_names import (
     sql_etpl_field_names,
     sql_excel_field_map,
     labor_fields_to_internal,
@@ -30,11 +32,20 @@ logger = logging.getLogger(__name__)
 # I called field names all kinds of things. This dictionary
 # returns the canonical name so that we don't have to hard code
 # things everywhere. The source name is assumed to be unique.
+#
+# This includes new field names
 canonical_field_name =\
     {
         'NAME': 'name',
         'NAME_1': 'name_1',
-        'mentioned_job_search_duration': 'mentioned_job_search_duration'
+        'mentioned_job_search_duration': 'mentioned_job_search_duration',
+        'TrainRoute1': 'google_direction_url',
+        'directions': 'google_direction_url',
+        'street1': 'street1',
+        'street2': 'street2',
+        'city': 'city',
+        'state': 'state',
+        'zip': 'zip'
     }
 
 get_standardized =\
@@ -45,6 +56,7 @@ get_standardized =\
         'featuresdescription': 'standardized_featuresdescription',
         "is_wioa": "mentions_wioa"
     }
+
 
 def input_source(from_filepath=None, from_table=None, remap_field_names=False, source="labor", debug_sample=None):
     df = None
@@ -356,6 +368,33 @@ def job_search_duration(from_df):
     return to_df
 
 
+def google_direction_url(from_df):
+    def clean_up(df, column):
+        ret = df[column].replace(
+            "\"", ""
+        ).apply(
+            lambda row: quote_plus(row) + '+' if isinstance(row, str) else ''
+        )
+        return ret
+
+    to_df = from_df
+    direction_field = canonical_field_name['directions']
+
+    base_url = "https://www.google.pl/maps/dir//"
+
+    name_field_to_use = 'name'
+    if 'standardized_name' in from_df:
+        name_field_to_use = 'standardized_name'
+
+    to_df[direction_field] =\
+        base_url                                            +\
+        clean_up(to_df, name_field_to_use)                  +\
+        clean_up(to_df, canonical_field_name['city'])       +\
+        clean_up(to_df, canonical_field_name['state'])      +\
+        str(to_df['zip'])
+    return to_df
+
+
 @click.command()
 @click.argument('remap_field_names', default=True)
 @click.argument('output_filepath', type=click.Path(), default="./D4AD_Standardization/data/interim/")
@@ -382,7 +421,6 @@ def main(remap_field_names, output_filepath, from_filepath, from_table):
         parenthesis_related(from_df=out_df, the_field='NAME_1')
     out_df =\
         structured_parenthesis_related(from_df=out_df, the_field='standardized_name_1')
-    
     logger.info('... standardizing abbreviations throughout ... will take a while ...')        
     out_df =\
     handle_abbreviations(from_df=out_df)
@@ -402,6 +440,10 @@ def main(remap_field_names, output_filepath, from_filepath, from_table):
     logger.info('... job search durations')
     out_df =\
         job_search_duration(from_df=out_df)
+
+    logger.info('... google direction link from listed address')
+    out_df =\
+        google_direction_url(from_df=out_df)
 
     content_is='standardized_etpl'
     logger.info(f"Done. Writing {content_is} to {output_filepath}. Remap fields names is {remap_field_names}")
