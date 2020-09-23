@@ -9,15 +9,15 @@ from dotenv import find_dotenv, load_dotenv
 import pandas as pd
 import regex
 import re         # for field identification
-from .utils.dataframe_manipulation import (
+from utils.dataframe_manipulation import (
     replace_values,
     extract_values,
     split_on,
     write_out
 )
-from .utils.abbreviation import multiple_mapper
-from .utils.field_indicator import get_name_name1_descriptions_indices
-from .utils.etpl_field_names import (
+from utils.abbreviation import multiple_mapper
+from utils.field_indicator import get_name_name1_descriptions_indices
+from utils.etpl_field_names import (
     sql_etpl_field_names,
     sql_excel_field_map,
     labor_fields_to_internal,
@@ -45,7 +45,10 @@ canonical_field_name =\
         'street2': 'street2',
         'city': 'city',
         'state': 'state',
-        'zip': 'zip'
+        'zip': 'zip',
+        'mention_hybrid':'mention_hybrid',
+        'mention_inperson': 'mention_inperson',
+        'mention_remote': 'mention_remote'
     }
 
 get_standardized =\
@@ -395,6 +398,66 @@ def google_direction_url(from_df):
     return to_df
 
 
+def instruction_type(from_df):
+    to_df = from_df
+
+    """    
+        'mention_hybrid':'mention_hybrid',
+        'mention_inperson': 'mention_inperson',
+        'mention_remote': 'mention_remote'
+    """
+    # Note: could make DRYer
+    hybrid_like =\
+        regex.compile(
+            '''
+            (hybrid){s<=1}            # is called hybrid, hybrd, hybird, etc.
+            ''',
+            flags=regex.I|regex.VERBOSE)
+
+    logger.info('\t[instruction type] mentions of hybrid')
+    hybrid_indices =\
+        get_name_name1_descriptions_indices(hybrid_like, to_df)
+
+    field = canonical_field_name['mention_hybrid']
+    to_df[field] = False
+    to_df.loc[hybrid_indices, field] = True
+
+    inperson_like =\
+        regex.compile(
+            '''
+            (in person){s<=1}            # is called in person
+            ''',
+            flags=regex.I|regex.VERBOSE)
+
+    logger.info('\t[instruction type] mentions of inperson')
+    inperson_indices =\
+        get_name_name1_descriptions_indices(inperson_like, to_df)
+
+    field = canonical_field_name['mention_inperson']
+    to_df[field] = False
+    to_df.loc[inperson_indices, field] = True
+
+    remote_like =\
+        regex.compile(
+            '''
+            \b(remote){s<=1}            # is called out as remote
+            |(online\))
+            |(\(online)            
+            |(offered online){s<=1}            # is offered online
+            ''',
+            flags=regex.I|regex.VERBOSE)
+
+    logger.info('\t[instruction type] mentions of remote')
+    remote_indices =\
+        get_name_name1_descriptions_indices(remote_like, to_df)
+
+    field = canonical_field_name['mention_remote']
+    to_df[field] = False
+    to_df.loc[remote_indices, field] = True
+
+    return to_df
+
+
 @click.command()
 @click.argument('remap_field_names', default=True)
 @click.argument('output_filepath', type=click.Path(), default="./D4AD_Standardization/data/interim/")
@@ -444,6 +507,10 @@ def main(remap_field_names, output_filepath, from_filepath, from_table):
     logger.info('... google direction link from listed address')
     out_df =\
         google_direction_url(from_df=out_df)
+
+    logger.info('... identifying mentions of instruction type')
+    out_df =\
+        instruction_type(from_df=out_df)
 
     content_is='standardized_etpl'
     logger.info(f"Done. Writing {content_is} to {output_filepath}. Remap fields names is {remap_field_names}")
