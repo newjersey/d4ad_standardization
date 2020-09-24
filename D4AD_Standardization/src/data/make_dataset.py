@@ -373,11 +373,15 @@ def job_search_duration(from_df):
 
 def google_direction_url(from_df):
     def clean_up(df, column):
-        ret = df[column].replace(
+        ret = df[column].str.replace(
             "\"", ""
-        ).apply(
-            lambda row: quote_plus(row) + '+' if isinstance(row, str) else ''
-        )
+        ) + "+"
+
+        ret =\
+            ret.apply(
+                lambda url: quote_plus(url) + '+' if isinstance(url, str) else ''
+            )
+
         return ret
 
     to_df = from_df
@@ -385,16 +389,22 @@ def google_direction_url(from_df):
 
     base_url = "https://www.google.pl/maps/dir//"
 
-    name_field_to_use = 'name'
-    if 'standardized_name' in from_df:
-        name_field_to_use = 'standardized_name'
+    name_field_to_use = 'name_1'
+    if get_standardized['name_1'] in from_df:
+        name_field_to_use = get_standardized['name_1']
 
     to_df[direction_field] =\
         base_url                                            +\
         clean_up(to_df, name_field_to_use)                  +\
         clean_up(to_df, canonical_field_name['city'])       +\
         clean_up(to_df, canonical_field_name['state'])      +\
-        str(to_df['zip'])
+        to_df['zip'].astype(str)
+
+    # clear out nan
+    nan_index =\
+        to_df[direction_field].str.contains('//nan', regex=False)
+    to_df.loc[nan_index, direction_field] = ''
+
     return to_df
 
 
