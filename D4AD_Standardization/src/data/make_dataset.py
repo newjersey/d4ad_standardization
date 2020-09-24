@@ -435,7 +435,9 @@ def instruction_type(from_df):
     inperson_like =\
         regex.compile(
             '''
-            (in person){s<=1}            # is called in person
+            \b(in person){s<=1}            # is called in person, in-person in free text
+            |(in person\)){s<=1}
+            |(\(in person){s<=1}
             ''',
             flags=regex.I|regex.VERBOSE)
 
