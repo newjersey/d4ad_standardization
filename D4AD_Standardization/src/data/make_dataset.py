@@ -16,7 +16,10 @@ from utils.dataframe_manipulation import (
     write_out
 )
 from utils.abbreviation import multiple_mapper
-from utils.field_indicator import get_name_name1_descriptions_indices
+from utils.field_indicator import (
+    get_name_name1_descriptions_indices,
+    indices_from_regex_search
+)
 from utils.etpl_field_names import (
     sql_etpl_field_names,
     sql_excel_field_map,
@@ -48,7 +51,9 @@ canonical_field_name =\
         'zip': 'zip',
         'mention_hybrid':'mention_hybrid',
         'mention_inperson': 'mention_inperson',
-        'mention_remote': 'mention_remote'
+        'mention_remote': 'mention_remote',
+        'statecomments': 'statecomments',
+        'commented_suspended_program_status': 'commented_suspended_program_status'
     }
 
 get_standardized =\
@@ -470,6 +475,50 @@ def instruction_type(from_df):
     return to_df
 
 
+def provider_course_status(from_df):
+    to_df = from_df
+    field = canonical_field_name['statecomments']
+
+    most_recent_entry =\
+        to_df[field].dropna()\
+                      .str\
+                      .split('\n', 1, expand=True)[0]
+
+    #  some entries, unfortunately, are seperated by commas instead
+    has_comma = most_recent_entry.str.contains(',')
+    most_recent_entry[has_comma] =\
+        most_recent_entry[has_comma].str.split(',', 1, expand=True)[0]
+        
+    suspend_like =\
+        regex.compile(
+            '''
+            \W(to suspended)
+            |\W(not seeking)
+            |\W(must submit)
+            |\W(suspended per)
+            |\W(expir)
+            |\W(not.*approved)
+            ''',
+            flags=regex.I|regex.VERBOSE)
+    """
+    negate_suspend_like =\
+        regex.compile(
+            '''
+            \b(reinstated.*expir)       # rare but does occur
+            ''',
+            flags=regex.I|regex.VERBOSE)
+    """
+
+    suspend_indices =\
+        indices_from_regex_search(most_recent_entry, suspend_like)
+
+    status_field = canonical_field_name['commented_suspended_program_status']
+    to_df[status_field] = False
+    to_df.loc[suspend_indices,  status_field] = True
+
+    return to_df
+
+
 @click.command()
 @click.argument('remap_field_names', default=True)
 @click.argument('output_filepath', type=click.Path(), default="./D4AD_Standardization/data/interim/")
@@ -520,9 +569,13 @@ def main(remap_field_names, output_filepath, from_filepath, from_table):
     out_df =\
         google_direction_url(from_df=out_df)
 
-    logger.info('... identifying mentions of instruction type')
+    logger.info('... identifying mentions of instruction type (remote, in-person, hybrid)')
     out_df =\
         instruction_type(from_df=out_df)
+
+    logger.info('... identifying program statuses (from statecomments)')
+    out_df =\
+        provider_course_status(from_df=out_df)
 
     content_is='standardized_etpl'
     logger.info(f"Done. Writing {content_is} to {output_filepath}. Remap fields names is {remap_field_names}")
