@@ -246,8 +246,8 @@ labor_fields_to_internal =\
     "officialname": "name",
     "wiaeligible": "is_wioa",
     "leadtodegree": "mentioned_associates",
-    "leadtoindustrycredential": "mentioned_certificate"
-    "statecomment": "statecomments"
+    "leadtoindustrycredential": "mentioned_certificate",
+    "statecomment": "statecomments",
     "providerstatecomment": "statecomments_1"
   }
 
@@ -258,8 +258,8 @@ internal_fields_to_labor =\
     "name_1": "name",
     "is_wioa": "wiaeligible",
     "mentioned_associates": "leadtodegree",
-    "mentioned_certificate": "leadtoindustrycredential"
-    "statecomments": "statecomment"
+    "mentioned_certificate": "leadtoindustrycredential",
+    "statecomments": "statecomment",
     "statecomments_1": "providerstatecomment"
   }
 
