@@ -203,7 +203,7 @@ labor_etpl_field_names =\
     "trnroute1",
     "trnroute2",
     "wibcomment",
-    "statecomment",
+    "providerstatecomment",
     "dtsubmitted",
     "statusname"
   }
@@ -247,6 +247,8 @@ labor_fields_to_internal =\
     "wiaeligible": "is_wioa",
     "leadtodegree": "mentioned_associates",
     "leadtoindustrycredential": "mentioned_certificate"
+    "statecomment": "statecomments"
+    "providerstatecomment": "statecomments_1"
   }
 
 # This dictionary maps fields back to what sql expects, and type
@@ -257,6 +259,8 @@ internal_fields_to_labor =\
     "is_wioa": "wiaeligible",
     "mentioned_associates": "leadtodegree",
     "mentioned_certificate": "leadtoindustrycredential"
+    "statecomments": "statecomment"
+    "statecomments_1": "providerstatecomment"
   }
 
 sql_type_map =\
