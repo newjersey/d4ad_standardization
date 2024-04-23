@@ -248,8 +248,7 @@ def handle_abbreviations(from_df):
     start = datetime.datetime.now()
     logger.info(f"\t[abbreviation] starting at {start}")
 
-    the_fields = [get_standardized['name_1'],
-                  'description', 
+    the_fields = ['description',
                   'featuresdescription']
     for a_field in the_fields:
         # get the standardized field if it exists, else returns same field
