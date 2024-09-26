@@ -86,6 +86,10 @@ def input_source(from_filepath=None, from_table=None, remap_field_names=False, s
             # Cheap way to run over a very small subset, inspect output
             df = df.sample(debug_sample)
 
+    # Ensure cipcode is exactly 6 digits by prepending zeros to shorter values
+    if 'cipcode' in df.columns:
+        df['cipcode'] = df['cipcode'].str.zfill(6)
+
     if remap_field_names:
         the_map = None
         if source == "sql":
